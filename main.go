@@ -7,6 +7,7 @@ import (
 	"vdi/todo-api/initializers"
 	"vdi/todo-api/middleware"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -36,6 +37,7 @@ func main() {
 
 	// Initiate Gin
 	router := gin.Default()
+	router.Use(cors.Default())
 
 	// Auth endpoints
 	router.POST("/auth/register", userHandler.Register)
@@ -57,5 +59,5 @@ func main() {
 	router.DELETE("/todos/:id", middleware.RequireAuth, todoHandler.DeleteTodo)
 
 	// Run
-	router.Run("localhost:8080")
+	router.Run()
 }
