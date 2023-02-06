@@ -116,7 +116,7 @@ func (h *userHandler) Register(c *gin.Context) {
 	c.SetCookie("Authorization", token, 60*60*24, "", "", false, true)
 
 	convertedUser := utils.ConvertToUserResponse(newUser)
-	c.IndentedJSON(http.StatusCreated, gin.H{"data": convertedUser})
+	c.IndentedJSON(http.StatusCreated, gin.H{"data": convertedUser, "token": token})
 }
 
 func (h *userHandler) Login(c *gin.Context) {
@@ -133,6 +133,20 @@ func (h *userHandler) Login(c *gin.Context) {
 	// Return the JWT as cookie
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("Authorization", token, 60*60*24, "", "", false, true)
+
+	convertedUser := utils.ConvertToUserResponse(user)
+	c.IndentedJSON(http.StatusCreated, gin.H{"data": convertedUser, "token": token})
+}
+
+func (h *userHandler) GetProfile(c *gin.Context) {
+	//  get user id from context
+	userID := c.MustGet("userID").(int)
+
+	user, err := h.userService.FindById(userID)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
 
 	convertedUser := utils.ConvertToUserResponse(user)
 	c.IndentedJSON(http.StatusOK, gin.H{"data": convertedUser})

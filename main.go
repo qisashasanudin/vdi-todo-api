@@ -42,6 +42,7 @@ func main() {
 	// Auth endpoints
 	router.POST("/auth/register", userHandler.Register)
 	router.POST("/auth/login", userHandler.Login)
+	router.GET("/auth/profile", middleware.RequireAuth, userHandler.GetProfile)
 	router.POST("/auth/logout", middleware.RequireAuth, userHandler.Logout)
 
 	// User endpoints
