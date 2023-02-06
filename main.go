@@ -36,26 +36,25 @@ func main() {
 
 	// Initiate Gin
 	router := gin.Default()
-	v1 := router.Group("/v1")
 
 	// Auth endpoints
-	v1.POST("/auth/register", userHandler.CreateUser)
-	v1.POST("/auth/login", userHandler.Login)
-	v1.POST("/auth/logout", middleware.RequireAuth, userHandler.Logout)
+	router.POST("/auth/register", userHandler.CreateUser)
+	router.POST("/auth/login", userHandler.Login)
+	router.POST("/auth/logout", middleware.RequireAuth, userHandler.Logout)
 
 	// User endpoints
-	// v1.POST("/users", middleware.RequireAuth, userHandler.CreateUser)
-	// v1.GET("/users", middleware.RequireAuth, userHandler.GetUsers)
-	// v1.GET("/users/:id", middleware.RequireAuth, userHandler.GetUserById)
-	// v1.PUT("/users/:id", middleware.RequireAuth, userHandler.UpdateUser)
-	// v1.DELETE("/users/:id", middleware.RequireAuth, userHandler.DeleteUser)
+	// router.POST("/users", middleware.RequireAuth, userHandler.CreateUser)
+	// router.GET("/users", middleware.RequireAuth, userHandler.GetUsers)
+	// router.GET("/users/:id", middleware.RequireAuth, userHandler.GetUserById)
+	// router.PUT("/users/:id", middleware.RequireAuth, userHandler.UpdateUser)
+	// router.DELETE("/users/:id", middleware.RequireAuth, userHandler.DeleteUser)
 
 	// Todo endpoints
-	v1.POST("/todos", middleware.RequireAuth, todoHandler.CreateTodo)
-	v1.GET("/todos", middleware.RequireAuth, todoHandler.GetTodos)
-	v1.GET("/todos/:id", middleware.RequireAuth, todoHandler.GetTodoById)
-	v1.PUT("/todos/:id", middleware.RequireAuth, todoHandler.UpdateTodo)
-	v1.DELETE("/todos/:id", middleware.RequireAuth, todoHandler.DeleteTodo)
+	router.POST("/todos", middleware.RequireAuth, todoHandler.CreateTodo)
+	router.GET("/todos", middleware.RequireAuth, todoHandler.GetTodos)
+	router.GET("/todos/:id", middleware.RequireAuth, todoHandler.GetTodoById)
+	router.PUT("/todos/:id", middleware.RequireAuth, todoHandler.UpdateTodo)
+	router.DELETE("/todos/:id", middleware.RequireAuth, todoHandler.DeleteTodo)
 
 	// Run
 	router.Run("localhost:8080")
