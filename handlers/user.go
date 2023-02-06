@@ -100,6 +100,25 @@ func (h *userHandler) DeleteUser(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"data": convertedUser})
 }
 
+func (h *userHandler) Register(c *gin.Context) {
+	var registerRequest user.RegisterRequest
+	err := c.ShouldBindJSON(&registerRequest)
+	utils.HandleValidationError(c, err)
+
+	newUser, token, err := h.userService.Register(registerRequest)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Return the JWT as cookie
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("Authorization", token, 60*60*24, "", "", false, true)
+
+	convertedUser := utils.ConvertToUserResponse(newUser)
+	c.IndentedJSON(http.StatusCreated, gin.H{"data": convertedUser})
+}
+
 func (h *userHandler) Login(c *gin.Context) {
 	var loginRequest user.LoginRequest
 	err := c.ShouldBindJSON(&loginRequest)
@@ -120,7 +139,7 @@ func (h *userHandler) Login(c *gin.Context) {
 }
 
 func (h *userHandler) Logout(c *gin.Context) {
-	// Delete the JWT as cookie
+	// Delete the JWT in the cookie
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("Authorization", "", -1, "", "", false, true)
 	c.IndentedJSON(http.StatusOK, gin.H{"data": "Logout success"})

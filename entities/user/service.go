@@ -15,11 +15,28 @@ type Service interface {
 	Create(userRequest CreateUserRequest) (User, error)
 	Update(ID int, userRequest UpdateUserRequest) (User, error)
 	Delete(ID int) (User, error)
+	Register(registerRequest RegisterRequest) (User, string, error)
 	Login(loginRequest LoginRequest) (User, string, error)
 }
 
 type service struct {
 	repository Repository
+}
+
+func generateJwt(userData User) (string, error) {
+	// Generate a JWT
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"sub": userData.ID,
+		"exp": time.Now().Add(time.Hour * 24).Unix(),
+	})
+
+	// Sign and get the complete encoded token as a string using the secret
+	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
 }
 
 func NewService(repository Repository) *service {
@@ -82,7 +99,33 @@ func (s *service) Delete(ID int) (User, error) {
 	return s.repository.Delete(user)
 }
 
-// login
+func (s *service) Register(b RegisterRequest) (User, string, error) {
+
+	// Hash the password
+	hash, err := bcrypt.GenerateFromPassword([]byte(*b.Password), 10)
+	if err != nil {
+		return User{}, "", err
+	}
+
+	// Create a user
+	user, err := s.repository.Create(User{
+		Email:    *b.Email,
+		Password: string(hash),
+	})
+	if err != nil {
+		return user, "", err
+	}
+
+	// Generate a JWT
+	tokenString, err := generateJwt(user)
+	if err != nil {
+		return user, "", err
+	}
+
+	// return user and token
+	return user, tokenString, nil
+}
+
 func (s *service) Login(b LoginRequest) (User, string, error) {
 	user, err := s.repository.FindByEmail(*b.Email)
 	if err != nil {
@@ -96,14 +139,7 @@ func (s *service) Login(b LoginRequest) (User, string, error) {
 	}
 
 	// Generate a JWT
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": user.ID,
-		"exp": time.Now().Add(time.Hour * 24).Unix(),
-	})
-
-	// Sign and get the complete encoded token as a string using the secret
-	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
-
+	tokenString, err := generateJwt(user)
 	if err != nil {
 		return user, "", err
 	}

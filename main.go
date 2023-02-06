@@ -38,7 +38,7 @@ func main() {
 	router := gin.Default()
 
 	// Auth endpoints
-	router.POST("/auth/register", userHandler.CreateUser)
+	router.POST("/auth/register", userHandler.Register)
 	router.POST("/auth/login", userHandler.Login)
 	router.POST("/auth/logout", middleware.RequireAuth, userHandler.Logout)
 
