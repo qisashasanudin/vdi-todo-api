@@ -35,9 +35,14 @@ func main() {
 	todoService := todo.NewService(todoRepository)
 	todoHandler := handlers.NewTodoHandler(todoService)
 
+	// Initiate CORS
+	config := cors.DefaultConfig()
+	config.AllowCredentials = true
+	config.AllowOrigins = []string{"http://localhost:4200"}
+
 	// Initiate Gin
 	router := gin.Default()
-	router.Use(cors.Default())
+	router.Use(cors.New(config))
 
 	// Auth endpoints
 	router.POST("/auth/register", userHandler.Register)

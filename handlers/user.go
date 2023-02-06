@@ -139,14 +139,8 @@ func (h *userHandler) Login(c *gin.Context) {
 }
 
 func (h *userHandler) GetProfile(c *gin.Context) {
-	//  get user id from context
-	userID := c.MustGet("userID").(int)
-
-	user, err := h.userService.FindById(userID)
-	if err != nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"error": err.Error()})
-		return
-	}
+	//  get user from context
+	user := c.MustGet("user").(user.User)
 
 	convertedUser := utils.ConvertToUserResponse(user)
 	c.IndentedJSON(http.StatusOK, gin.H{"data": convertedUser})

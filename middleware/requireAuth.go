@@ -51,8 +51,6 @@ func RequireAuth(c *gin.Context) {
 
 		// continue
 		c.Next()
-	} else {
-		fmt.Println(err)
 	}
 
 }
