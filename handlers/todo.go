@@ -66,7 +66,8 @@ func (h *todoHandler) CreateTodo(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusCreated, gin.H{"data": newTodo})
+	convertedTodo := utils.ConvertToTodoResponse(newTodo)
+	c.IndentedJSON(http.StatusCreated, gin.H{"data": convertedTodo})
 }
 
 func (h *todoHandler) UpdateTodo(c *gin.Context) {
@@ -83,7 +84,8 @@ func (h *todoHandler) UpdateTodo(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusCreated, gin.H{"data": newTodo})
+	convertedTodo := utils.ConvertToTodoResponse(newTodo)
+	c.IndentedJSON(http.StatusCreated, gin.H{"data": convertedTodo})
 }
 
 func (h *todoHandler) DeleteTodo(c *gin.Context) {
